@@ -1,5 +1,6 @@
 from flask import jsonify
 from app import db
+from clients.pessoa_service_client import AtividadeServiceClient
 
 # atividades = [
 #     {
@@ -24,32 +25,50 @@ from app import db
 
 class Atividade(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    disciplina_id = db.Column(db.Integer, nullable=False)
+    professor_id = db.Column(db.Integer, nullable=False)
     enunciado = sala = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, disciplina_id, enunciado):
-        self.disciplina_id = disciplina_id
+    def __init__(self, professor_id, enunciado):
+        self.professor_id = professor_id
         self.enunciado = enunciado
 
     def to_dict(self):
         return {
             'id': self.id,
-            'disciplina_id': self.disciplina_id,
+            'professor_id': self.professor_id,
             'enunciado': self.enunciado
         }
 
 class AtividadeNotFound(Exception):
     pass
 
-def listar_atividades():
+def getAtividades():
     atividades = Atividade.query.all()
     lista_atividades = []
     for atividade in atividades:
         lista_atividades.append(atividade.to_dict())
     return lista_atividades
 
-def obter_atividade(id_atividade):
+def getAtividadeById(id_atividade):
     atividade = Atividade.query.get(id_atividade)
     if not atividade:
         raise AtividadeNotFound
     return atividade.to_dict()
+
+def createAtividade(dados):
+    professor_id = dados.get("professor_id")
+
+    if not AtividadeServiceClient.validar_professor(professor_id):
+        return jsonify({
+            'erro': "Professor não encontrado",
+            "codigo": 400
+        })
+
+    novaAtividade = Atividade(
+        professor_id = professor_id,
+        enunciado = dados.get("enunciado")
+    )
+
+    db.session.add(novaAtividade)
+    db.session.commit
+    return novaAtividade.to_dict()
