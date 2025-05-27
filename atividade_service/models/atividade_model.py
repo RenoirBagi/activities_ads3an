@@ -1,32 +1,12 @@
 from flask import jsonify
-from app import db
+from config import db
 from clients.pessoa_service_client import AtividadeServiceClient
 
-# atividades = [
-#     {
-#         'id_atividade': 1,
-#         'id_disciplina': 1,
-#         'enunciado': 'Crie um app de todo em Flask',
-#         'respostas': [
-#             {'id_aluno': 1, 'resposta': 'todo.py', 'nota': 9},
-#             {'id_aluno': 2, 'resposta': 'todo.zip.rar'},
-#             {'id_aluno': 4, 'resposta': 'todo.zip', 'nota': 10}
-#         ]
-#     },
-#     {
-#         'id_atividade': 2,
-#         'id_disciplina': 1,
-#         'enunciado': 'Crie um servidor que envia email em Flask',
-#         'respostas': [
-#             {'id_aluno': 4, 'resposta': 'email.zip', 'nota': 10}
-#         ]
-#     }
-# ]
 
 class Atividade(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     professor_id = db.Column(db.Integer, nullable=False)
-    enunciado = sala = db.Column(db.String(255), nullable=False)
+    enunciado = db.Column(db.String(255), nullable=False)
 
     def __init__(self, professor_id, enunciado):
         self.professor_id = professor_id
@@ -70,5 +50,5 @@ def createAtividade(dados):
     )
 
     db.session.add(novaAtividade)
-    db.session.commit
+    db.session.commit()
     return novaAtividade.to_dict()
