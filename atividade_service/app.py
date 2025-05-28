@@ -1,9 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
 from config import db, app
 from controllers.atividade_controller import atividade_bp
+from controllers.resposta_controller import resposta_bp
 
 app.register_blueprint(atividade_bp)
-
+app.register_blueprint(resposta_bp)
 
 with app.app_context():
     db.create_all()

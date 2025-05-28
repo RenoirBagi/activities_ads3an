@@ -21,5 +21,5 @@ def obter_resposta(id_resposta):
 @resposta_bp.route('/respostas', methods = ['POST'])
 def criar_resposta():
     dados = request.json
-    atividade = createResposta
+    atividade = createResposta(dados)
     return atividade

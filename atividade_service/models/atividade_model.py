@@ -2,11 +2,11 @@ from flask import jsonify
 from config import db
 from clients.pessoa_service_client import AtividadeServiceClient
 
-
 class Atividade(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     professor_id = db.Column(db.Integer, nullable=False)
     enunciado = db.Column(db.String(255), nullable=False)
+    respostas = db.relationship('Resposta', back_populates = 'atividade')
 
     def __init__(self, professor_id, enunciado):
         self.professor_id = professor_id
@@ -16,7 +16,8 @@ class Atividade(db.Model):
         return {
             'id': self.id,
             'professor_id': self.professor_id,
-            'enunciado': self.enunciado
+            'enunciado': self.enunciado,
+            "respostas": [resposta.to_dict() for resposta in self.respostas]
         }
 
 class AtividadeNotFound(Exception):
