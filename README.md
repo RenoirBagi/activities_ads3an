@@ -4,7 +4,7 @@ API para controle de Atividades, integrada com ao serviço de Sistema Escolar.
 
 ## Descrição
 
-A API de Atividades é um microsserviço responsável por controlar a entrega de atividades e respostas, permitindo a consulta e criação de uma atividade ou de uma respostaa. Esse serviço opera de forma integrada com a API Sistema Escolar, da qual depende para validações essenciais.
+A API de Atividades é um microsserviço responsável por controlar a entrega de atividades e respostas, permitindo a consulta e criação de uma atividade ou de uma resposta. Esse serviço opera de forma integrada com a API Sistema Escolar, da qual depende para validações essenciais.
 
 ## Funcionalidades principais
 #### Criação de uma atividade ou resposta: Ao receber uma solicitação de atividade ou resposta, a API realiza:
