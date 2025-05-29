@@ -4,10 +4,30 @@ API para controle de Atividades, integrada com ao serviço de Sistema Escolar.
 
 ## Descrição
 
-- Realiza o controle das atividades, recebendo as respectivas respostas.
-- Valida a existência de Professores e Alunos baseada na integração com o microsserviço de Sistema Escolar.
-- Tecnologias utilizadas: Python/Flask, SQLAlchemy e Docker.
+A API de Atividades é um microsserviço responsável por controlar a entrega de atividades e respostas, permitindo a consulta e criação de uma atividade ou de uma respostaa. Esse serviço opera de forma integrada com a API Sistema Escolar, da qual depende para validações essenciais.
 
+## Funcionalidades principais
+#### Criação de uma atividade ou resposta: Ao receber uma solicitação de atividade ou resposta, a API realiza:
+
+###### Para atividades:
+- Validação da existência de um professor da atividade solicitada, por meio de consulta a API Sistema Escolar.
+
+###### Para respostas:
+- Validação da existência de um aluno da resposta solicitada, por meio de consulta a API Sistema Escolar.
+-------------------------------------------------------------------------------------------------------------
+#### Consulta - O que é possível buscar:
+###### Para atividades
+- Uma atividade específica, a partir do seu ID.
+- Todas as atividades registradas.
+
+###### Para respostas
+- Uma resposta específica, a partir do seu ID.
+- Todas as respostas registradas.
+
+## Tecnologias utilizadas
+- Python com Flask (framework web)
+- SQLAlchemy (ORM para acesso ao banco de dados)
+- Docker (containerização do serviço)
 
 ## Execução com Docker
 
@@ -29,7 +49,7 @@ API para controle de Atividades, integrada com ao serviço de Sistema Escolar.
    ```bash
    http://localhost:5002/atividades
 
-#### Principais Endpoints
+## Endpoints Principais
 
 - GET/atividades - Lista todas as atividades.
 - GET/atividades/< id > - Lista uma atividade baseada em seu ID.
@@ -39,13 +59,19 @@ API para controle de Atividades, integrada com ao serviço de Sistema Escolar.
 - GET/respostas/< id > - Lista uma resposta baseada no seu ID.
 - POST/repostas - Cria uma nova resposta.
 
-### Fluxo Principal
+## Ecossistema de Microsserviços para Sistema Escolar
+#### Validação de professor (professor_id):
+- Ao longo do processo de criação de uma atividade, o arquivo pessoa_service_client.py realiza uma requisição a API Sistema Escolar, enviando o professor_id fornecido na solicitação.
+- Dessa forma, a API Sistema Escolar consulta a tabela de professores no banco de dados app.db, buscando um professor com um id correspondente.
+- Caso o professor seja encontrado (isto é, o id retornado seja igual ao professor_id enviado), a validação de professor é considerada bem sucessida, assim concluindo a primeira etapa do processo de criação da atividade.
 
-- aaa
-- aa
-- a
+#### Validação de aluno (aluno_id):
+- Ao longo do processo de criação de uma resposta, o arquivo pessoa_service_client.py realiza uma requisição a API Sistema Escolar, enviando o aluno_id fornecido na solicitação.
+- Dessa forma, a API Sistema Escolar consulta a tabela de alunos no banco de dados app.db, buscando um aluno com um id correspondente.
+- Caso o aluno seja encontrado (isto é, o id retornado seja igual ao aluno_id enviado), a validação de aluno é considerada bem sucessida, assim concluindo a primeira etapa do processo de criação de resposta.
 
-### Protocolos de Integração
+
+## Protocolos de Integração
 
 - Comunicação síncrona via HTTP REST
 - Formato JSON para todas as requisições
@@ -72,27 +98,41 @@ API para controle de Atividades, integrada com ao serviço de Sistema Escolar.
     atividade = db.relationship('Atividade', back_populates = 'respostas')
 ```
 
-### Desenvolvimento - Estrutura dos Arquivos
+### Desenvolvimento 
 
+## Arquitetura 
+### MVC
+
+O projeto segue o padrão de arquitetura MVC (Model-View-Controller), promovendo a separação de responsabilidades, assim, facilitando a manutenção e escalabilidade do sistema.
+
+- Model (Modelo)
+  - Local: atividade_service/models/atividade_model.py e resposta_model.py
+  - Função: Define a estruturas das entidades Atividade e Resposta com o SQLAlchemy. Responsável por representar os dados e regras de persistência da aplicação
+
+- Controller
+  - Local: atividade_service/controllers/atividade_controller.py e resposta_controller.py
+  - Função: Define as rotas (endpoints) da API, recebendo as requisições e encaminhado-as para os serviços apropriados. Atua como a camada que interage diretamente com o cliente da API (ex: front-end, algum outro sistema, etc).
+
+### Estrutura de Arquivos
 ```bash
 ACTIVITIES_ADS3AN/
       ├──atividade_service/
          ├── clients/         
-         │   └── pessoa_service_client.py   
+         │   └── pessoa_service_client.py     # Conexão com a API Sistema Escolar  
          ├── controllers/              
-         │   ├── atividade_controller.py
+         │   ├── atividade_controller.py      # Rotas
              └── resposta_controller.py    
          ├── instance/            
-         │   └── atividades.db
+         │   └── atividades.db                # Banco de Dados
          ├── models/
-         │    ├── atividade_model.py
+         │    ├── atividade_model.py          # Modelos de dados
               └── resposta_model.py      
-         ├── app.py                
-         └── config.py                   
-      ├──.gitgnore
-      ├──Dockerfile
-      ├──README.md
-      ├──requirements.txt
+         ├── app.py                           # Aplicação principal       
+         └── config.py                        # Configuração do banco 
+      ├──.gitgnore                            # Define quais arquivos/pastas o Git deve ignorar
+      ├──Dockerfile                           # Criar imagem Docker
+      ├──README.md                            # Documentação
+      ├──requirements.txt                     # Dependências
 ```
 
 ### Exemplo de Requisição
@@ -100,8 +140,10 @@ ACTIVITIES_ADS3AN/
 #### Para Atividade
 ```bash
 {
+    "id": 1
     "professor_id": 2, 
     "enunciado": "Redija um texto sobre microsserviços"
+    "repostas": "texto.txt"
 }
 ```
 
